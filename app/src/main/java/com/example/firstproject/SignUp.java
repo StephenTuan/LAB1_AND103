@@ -39,15 +39,12 @@ public class SignUp extends AppCompatActivity {
         });
         init();
     }
-
     public void init(){
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
         btnQuenMk = findViewById(R.id.btnQuenMk);
-
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextEmail = findViewById(R.id.editTextEmail);
-
         mAuth = FirebaseAuth.getInstance();
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +59,6 @@ public class SignUp extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     Toast.makeText(getApplicationContext(), "Đăng ký thành công", Toast.LENGTH_SHORT).show();
-                                   // finish();
                                 } else {
                                     String errorMessage = task.getException().getMessage();
                                     Toast.makeText(getApplicationContext(), "Đăng ký thất bại: " + errorMessage, Toast.LENGTH_SHORT).show();
@@ -84,7 +80,6 @@ public class SignUp extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     Toast.makeText(getApplicationContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                                    // finish();
                                 } else {
                                     String errorMessage = task.getException().getMessage();
                                     Toast.makeText(getApplicationContext(), "Đăng nhập thất bại: " + errorMessage, Toast.LENGTH_SHORT).show();
@@ -102,9 +97,7 @@ public class SignUp extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-
                             Toast.makeText(getApplicationContext(), "Check mail", Toast.LENGTH_SHORT).show();
-                            // finish();
                         } else {
                             String errorMessage = task.getException().getMessage();
                             Toast.makeText(getApplicationContext(), "Fail" + errorMessage, Toast.LENGTH_SHORT).show();
