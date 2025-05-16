@@ -1,5 +1,8 @@
 package com.example.firstproject;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,24 +17,27 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthMissingActivityForRecaptchaException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
 import java.util.concurrent.TimeUnit;
 
-public class bai2 extends AppCompatActivity {
+public class Bai3 extends AppCompatActivity {
 
     EditText edPhoneNumber, edOtp;
     Button btnGetOtp, btnLogin2;
     private FirebaseAuth mAuth;
-    String phoneNumber, mVerificationId;
-
+    private String mVerificationId;
+    String phoneNumber, Otp, nVeridicationId;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     @Override
@@ -56,14 +62,15 @@ public class bai2 extends AppCompatActivity {
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 Log.e("PhoneAuth", "Verification failed" + e.getMessage());
-                Toast.makeText(bai2.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(Bai3.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
 
             }
 
             public void onCodeSent(@NonNull String verificationId,
                                    @NonNull PhoneAuthProvider.ForceResendingToken token) {
-                Toast.makeText(bai2.this, "OTP sent!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Bai3.this, "OTP sent success!", Toast.LENGTH_SHORT).show();
                 mVerificationId = verificationId;
+                mResendToken = token;
             }
 
         };
@@ -86,15 +93,49 @@ public class bai2 extends AppCompatActivity {
                 getOTP(phoneNumber);
             }
         });
+        btnLogin2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Otp = edOtp.getText().toString();
+                verifyOTP(Otp);
+            }
+        });
     }
     private void getOTP(String phoneNumber){
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
                         .setPhoneNumber("+84" + phoneNumber)
                         .setTimeout(60L, TimeUnit.SECONDS)
-                        .setActivity(bai2.this)
+                        .setActivity(Bai3.this)
                         .setCallbacks(mCallbacks)
                         .build();
         PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+    private void verifyOTP(String code){
+        if (mVerificationId == null || code == null || code.isEmpty()) {
+            Toast.makeText(this, "Verification ID or code is missing!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
+        signInWithPhoneAuthCredential(credential);
+    }
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(Bai3.this,"Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            FirebaseUser user = task.getResult().getUser();
+                            startActivity(new Intent(Bai3.this, LogOutScreen.class));
+                        } else {
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            }
+                        }
+                    }
+                });
     }
 }

@@ -1,5 +1,6 @@
 package com.example.firstproject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -80,6 +81,7 @@ public class SignUp extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     Toast.makeText(getApplicationContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                    startActivity(new  Intent(SignUp.this, Bai3.class));
                                 } else {
                                     String errorMessage = task.getException().getMessage();
                                     Toast.makeText(getApplicationContext(), "Đăng nhập thất bại: " + errorMessage, Toast.LENGTH_SHORT).show();
